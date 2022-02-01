@@ -26,9 +26,9 @@ Por favor marca a continuación los ejericios que hayais terminado:
 
 - [x] 1. Crea el proyecto
 - [x] 2. Arranca el backend
-- [x ] 3. Arranca el front end
-- [x ] 4. Prueba el proyecto
-- [x ] 5. Entiende el código del proyecto
+- [x] 3. Arranca el front end
+- [x] 4. Prueba el proyecto
+- [x] 5. Entiende el código del proyecto
 
 4.2 Express JS I:
 
