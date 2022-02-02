@@ -39,9 +39,11 @@ const App = () => {
       sort: allMoviesOptionSort
     };
     apiMovies.getMoviesFromApi(params).then(response => {
-      setAppMovies(response.movies);
+      setAppMovies(response);
     });
   }, [allMoviesOptionGender, allMoviesOptionSort]);
+
+  
 
   /*
   useEffect: obtener el perfil de la usuaria.
