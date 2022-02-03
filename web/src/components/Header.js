@@ -46,7 +46,7 @@ const Header = props => {
   return (
     <header className="col2 border--medium">
       <Link className="nav__link" to="/">
-        <h1 className="title--big">Netflix</h1>
+        <h1 className="title--big">Netflix-React</h1>
       </Link>
       <nav className="text-align-right">
         <ul>
