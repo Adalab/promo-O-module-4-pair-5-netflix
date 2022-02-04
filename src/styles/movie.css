@@ -1,0 +1,13 @@
+@import url(//fonts.googleapis.com/css2?family=Roboto&display=swap);
+@import url(//beta.adalab.es/resources/stylesheets/all.css);
+
+.body{
+    margin: 10%;
+}
+
+.movie__title{
+    color: #14d9c4;
+    font-size: 26px;
+    margin-bottom: 20px;
+}
+
