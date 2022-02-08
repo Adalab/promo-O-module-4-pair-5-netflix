@@ -80,6 +80,26 @@ server.post('/login', (req, res) => {
     });
   }
 });
+server.post('/sign-up', (req, res) => {
+  const email = req.body.email;
+
+  const password = req.body.password;
+  const query = db.prepare('insert into users (email,password) values (?,?)')
+  const result = query.run(email, password)
+
+  res.json({
+    "success": true,
+    "userId": result.lastInsertRowid
+  }
+
+
+
+  )
+
+
+
+
+});
 
 const staticServerPathCss = './src/styles';
 server.use(express.static(staticServerPathCss));
