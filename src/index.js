@@ -1,44 +1,43 @@
-const express = require('express');
-const cors = require('cors');
-const movieData = require('../web/src/data/movies.json');
-const users = require('../web/src/data/users.json');
-const DataBase = require('better-sqlite3');
+const express = require("express");
+const cors = require("cors");
+const movieData = require("../web/src/data/movies.json");
+const users = require("../web/src/data/users.json");
+const DataBase = require("better-sqlite3");
 
 // create and config server
 const server = express();
 server.use(cors());
 server.use(express.json());
 
-server.set('view engine', 'ejs');
+server.set("view engine", "ejs");
 
 // init express aplication
-const serverPort = 3000;
+const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
-const db = new DataBase('./src/db/database.db', { verbose: console.log() });
+const db = new DataBase("./src/db/database.db", { verbose: console.log() });
 
-server.get('/movie/:movieId', (req, res) => {
+server.get("/movie/:movieId", (req, res) => {
   const movieId = req.params.movieId;
   const findMovie = movieData.movies.find(
     (movie) => movie.id === parseInt(movieId)
   );
-  res.render('movie', findMovie);
+  res.render("movie", findMovie);
 });
 
-const staticServerPath = './src/public-react';
+const staticServerPath = "./src/public-react";
 server.use(express.static(staticServerPath));
 
-server.get('/movies', (req, res) => {
-  console.log(req.query);
-  const queryAll = db.prepare('SELECT * FROM movies ORDER BY name');
+server.get("/movies", (req, res) => {
+  const queryAll = db.prepare("SELECT * FROM movies ORDER BY name");
   const queryGender = db.prepare(
-    'SELECT * FROM movies WHERE gender = ? ORDER BY name'
+    "SELECT * FROM movies WHERE gender = ? ORDER BY name"
   );
-  const querySortAll = db.prepare('SELECT * FROM movies ORDER BY name DESC');
+  const querySortAll = db.prepare("SELECT * FROM movies ORDER BY name DESC");
   const querySortGender = db.prepare(
-    'SELECT * FROM movies WHERE gender = ? ORDER BY name DESC'
+    "SELECT * FROM movies WHERE gender = ? ORDER BY name DESC"
   );
   const allMovies = queryAll.all();
   const genderFilterParam = req.query.gender;
@@ -46,49 +45,43 @@ server.get('/movies', (req, res) => {
   const moviesByGender = queryGender.all(genderFilterParam);
   const moviesSortedGender = querySortGender.all(genderFilterParam);
   const moviesSorted = querySortAll.all();
-  if (moviesByGender.length !== 0 && sortFilterParam === 'desc') {
+  if (moviesByGender.length !== 0 && sortFilterParam === "desc") {
     res.send(moviesSortedGender);
-  } else if (moviesByGender.length !== 0 && sortFilterParam === 'asc') {
+  } else if (moviesByGender.length !== 0 && sortFilterParam === "asc") {
     res.send(moviesByGender);
-  } else if (moviesByGender.length === 0 && sortFilterParam === 'desc') {
+  } else if (moviesByGender.length === 0 && sortFilterParam === "desc") {
     res.send(moviesSorted);
-  } else if (moviesByGender.length === 0 && sortFilterParam === 'asc') {
+  } else if (moviesByGender.length === 0 && sortFilterParam === "asc") {
     res.send(allMovies);
   }
 });
 
-const staticServerPathImages = './src/public-movies-images';
+const staticServerPathImages = "./src/public-movies-images";
 server.use(express.static(staticServerPathImages));
 
-server.post('/login', (req, res) => {
-  console.log(req.body);
-  console.log(users);
-  const findUser = users.find(
-    (user) =>
-      user.email === req.body.email && user.password === req.body.password
-  );
-  console.log(findUser);
-  if (findUser) {
+server.post("/login", (req, res) => {
+  const query = db.prepare("SELECT * FROM users WHERE email = ?");
+  const response = query.get(req.body.email);
+  if (response !== undefined) {
     res.json({
       success: true,
-      userId: 'id_de_la_usuaria_encontrada',
+      userId: response.userId,
     });
   } else {
     res.json({
       success: false,
-      errorMessage: 'Usuaria/o no encontrada/o',
+      errorMessage: "Usuaria/o no encontrada/o",
     });
   }
 });
 
-server.post('/sign-up', (req, res) => {
+server.post("/sign-up", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const querySelect = db.prepare('SELECT * FROM users WHERE email = ?');
+  const querySelect = db.prepare("SELECT * FROM users WHERE email = ?");
   const foundUser = querySelect.get(email);
-  console.log(foundUser);
   if (foundUser === undefined) {
-    const query = db.prepare('insert into users (email,password) values (?,?)');
+    const query = db.prepare("insert into users (email,password) values (?,?)");
     const result = query.run(email, password);
     res.json({
       success: true,
@@ -97,10 +90,20 @@ server.post('/sign-up', (req, res) => {
   } else {
     res.json({
       success: false,
-      errorMessage: 'Usuaria/o ya registrada/o',
+      errorMessage: "Usuaria/o ya registrada/o",
     });
   }
 });
 
-const staticServerPathCss = './src/styles';
+server.get("/user/movies", (req, res) => {
+  console.log(req.headers.userid);
+  const userId = parseInt(req.headers.userid);
+  const movieIdsQuery = db.prepare(
+    "SELECT idMovie FROM users_movies WHERE idUser = ?"
+  );
+  const moviesId = movieIdsQuery.all(userId);
+  console.log(moviesId);
+});
+
+const staticServerPathCss = "./src/styles";
 server.use(express.static(staticServerPathCss));
