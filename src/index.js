@@ -80,25 +80,26 @@ server.post('/login', (req, res) => {
     });
   }
 });
+
 server.post('/sign-up', (req, res) => {
   const email = req.body.email;
-
   const password = req.body.password;
-  const query = db.prepare('insert into users (email,password) values (?,?)')
-  const result = query.run(email, password)
-
-  res.json({
-    "success": true,
-    "userId": result.lastInsertRowid
+  const querySelect = db.prepare('SELECT * FROM users WHERE email = ?');
+  const foundUser = querySelect.get(email);
+  console.log(foundUser);
+  if (foundUser === undefined) {
+    const query = db.prepare('insert into users (email,password) values (?,?)');
+    const result = query.run(email, password);
+    res.json({
+      success: true,
+      userId: result.lastInsertRowid,
+    });
+  } else {
+    res.json({
+      success: false,
+      errorMessage: 'Usuaria/o ya registrada/o',
+    });
   }
-
-
-
-  )
-
-
-
-
 });
 
 const staticServerPathCss = './src/styles';
